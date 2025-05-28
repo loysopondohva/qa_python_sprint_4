@@ -7,11 +7,6 @@ from main import BooksCollector
 # обязательно указывать префикс Test
 class TestBooksCollector:
 
-    @pytest.fixture(autouse=True)
-    def collector(self):
-        collector = BooksCollector()
-        return collector
-
     # пример теста:
     # обязательно указывать префикс test_
     # дальше идет название метода, который тестируем add_new_book_
@@ -26,7 +21,7 @@ class TestBooksCollector:
 
         # проверяем, что добавилось именно две
         # словарь books_rating, который нам возвращает метод get_books_rating, имеет длину 2
-        assert len(collector.get_books_genre) == 2
+        assert len(collector.get_books_genre()) == 2
 
     # напиши свои тесты ниже
     # чтобы тесты были независимыми в каждом из них создавай отдельный экземпляр класса BooksCollector()
@@ -42,3 +37,17 @@ class TestBooksCollector:
 #   def delete_book_from_favorites(self, name) - 1 позитив, 1 негатив (книги нет в избранном)
 #   def get_list_of_favorites_books(self) - 1 позитив
 
+    def test_empty_books_genre_and_favorites_true(self):
+        collector = BooksCollector()
+        assert collector.books_genre == {} and collector.favorites == []
+    
+    def test_genre_list_and_age_rating_list_true(self):
+        collector = BooksCollector()
+        expected_genre_list = ['Фантастика', 'Ужасы', 'Детективы', 'Мультфильмы', 'Комедии']
+        expected_genre_age_rating = ['Ужасы', 'Детективы']
+        assert collector.genre == expected_genre_list and collector.genre_age_rating == expected_genre_age_rating
+    
+    def test_add_new_book_14_letters_book_added(self):
+        collector = BooksCollector()
+        collector.add_new_book('Синий Трактор')
+        assert len(collector.get_books_genre()) == 1
