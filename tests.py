@@ -37,17 +37,33 @@ class TestBooksCollector:
 #   def delete_book_from_favorites(self, name) - 1 позитив, 1 негатив (книги нет в избранном)
 #   def get_list_of_favorites_books(self) - 1 позитив
 
+# Проверка метода __init__ на корректную инициализацию books_genre и favorites
     def test_empty_books_genre_and_favorites_true(self):
         collector = BooksCollector()
         assert collector.books_genre == {} and collector.favorites == []
-    
+
+# Проверка метода __init__ на корректную инициализацию genre и genre_age_rating    
     def test_genre_list_and_age_rating_list_true(self):
         collector = BooksCollector()
         expected_genre_list = ['Фантастика', 'Ужасы', 'Детективы', 'Мультфильмы', 'Комедии']
         expected_genre_age_rating = ['Ужасы', 'Детективы']
         assert collector.genre == expected_genre_list and collector.genre_age_rating == expected_genre_age_rating
-    
-    def test_add_new_book_14_letters_book_added(self):
+
+# Проверка метода add_new_book(), книга добавляется, при длине имени меньше 40 символов и отсутствии в коллекции  
+    def test_add_new_book_14_letters_name_book_added(self):
         collector = BooksCollector()
         collector.add_new_book('Синий Трактор')
         assert len(collector.get_books_genre()) == 1
+ 
+# Проверка метода add_new_book(), книга не добавляется при некорректном имени
+    @pytest.mark.parametrize("name, expected_count", [
+            ('Params', 1),  # Проверка при добавлении книги, которая уже есть в коллекции
+            ('', 1),        # Проверка при пустом названии книги
+            ('Params' * 10, 1) # Проверка при названии книги больше 40 символов длинной
+        ])
+    def test_add_new_book_incorrect_name_add_book_not_add(self, name, expected_count):
+        collector = BooksCollector()
+        collector.add_new_book(name)
+        collector.add_new_book('Params')
+        assert len(collector.get_books_genre()) == expected_count
+    
