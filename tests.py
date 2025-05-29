@@ -1,6 +1,5 @@
 import pytest
 
-
 from main import BooksCollector
 
 # класс TestBooksCollector объединяет набор тестов, которыми мы покрываем наше приложение BooksCollector
@@ -57,24 +56,32 @@ class TestBooksCollector:
  
 # Проверка метода add_new_book(), книга не добавляется при некорректном имени
     @pytest.mark.parametrize("name, expected_count", [
-            ('Params', 1),  # Проверка при добавлении книги, которая уже есть в коллекции
+            ('Котёнок Гав', 1),  # Проверка при добавлении книги, которая уже есть в коллекции
             ('', 1),        # Проверка при пустом названии книги
-            ('Params' * 10, 1) # Проверка при названии книги больше 40 символов длинной
+            ('Барабулька' * 10, 1) # Проверка при названии книги больше 40 символов длинной
         ])
     def test_add_new_book_incorrect_name_add_book_not_add(self, name, expected_count):
         collector = BooksCollector()
         collector.add_new_book(name)
-        collector.add_new_book('Params')
+        collector.add_new_book('Котёнок Гав')
         assert len(collector.get_books_genre()) == expected_count
 
-# Проверка метода  get_books_with_specific_genre(), выводится список книг одно жанра   
-    def test_get_books_with_specific_genre_from_genre_list_books_shows(self):
+# Проверка метода set_book_genre(). Книга добавляется, если она есть в списке книг и жанр из списка жанров    
+    def test_set_book_genre_book_and_genre_in_collectin_genre_added(self):
         collector = BooksCollector()
-        collector.add_new_book('Звёздные Войны')
-        collector.set_book_genre('Звёздные Войны', 'Фантастика') 
-        collector.add_new_book('Доктор Кто')
-        collector.set_book_genre('Доктор Кто', 'Фантастика') 
-        collector.add_new_book('Фунтик')
-        collector.set_book_genre('Фунтик', 'Мультфильмы')
-        print(collector.get_books_genre())
-        assert collector.get_books_with_specific_genre('Фантастика') == ['Звёздные Войны', 'Доктор Кто']
+        collector.add_new_book('Преступление и наказание')
+        collector.set_book_genre('Преступление и наказание', 'Детективы')
+        assert collector.get_books_with_specific_genre('Детективы') == ['Преступление и наказание']
+
+# Проверка метода set_book_genre(). Книга не добавляется
+    @pytest.mark.parametrize('name, genre', [
+        ('Преступление и наказание', 'Скороговорки'),
+        ('Котёнок Гав', 'Мультфильмы'),
+        ('Преступление и наказание', ''),
+        ('', 'Детективы'),
+    ])
+    def test_set_book_genre_book_and_genre_in_collectin_genre_added(self, name, genre):
+        collector = BooksCollector()
+        collector.add_new_book('Преступление и наказание')
+        collector.set_book_genre(name, genre)
+        assert not collector.get_books_with_specific_genre(genre) == [name]
