@@ -26,11 +26,11 @@ class TestBooksCollector:
     # напиши свои тесты ниже
     # чтобы тесты были независимыми в каждом из них создавай отдельный экземпляр класса BooksCollector()
 
-#    def __init__(self) - 1 позитивная
-#    def add_new_book(self, name) - 1 pos, 2 neg (уже есть в списке, больше 41 буквы)
-#    def set_book_genre(self, name, genre) - 1 pos,  2 neg (нет в списке книг, жанра нет в списке жанров)
-#   def get_book_genre(self, name) - 1 pos
-#   def get_books_with_specific_genre(self, genre) 1 pos, 1 нег (жанра нет в списке жанров)
+#+    def __init__(self) - 1 позитивная
+#+    def add_new_book(self, name) - 1 pos, 2 neg (уже есть в списке, больше 41 буквы)
+#+   def set_book_genre(self, name, genre) - 1 pos,  2 neg (нет в списке книг, жанра нет в списке жанров)
+#+   def get_book_genre(self, name) - 1 pos
+#+  def get_books_with_specific_genre(self, genre) 1 pos, 1 нег (жанра нет в списке жанров)
 #   def get_books_genre(self) - 1 позитив
 #   def get_books_for_children(self) - 1 позитив
 #   def add_book_in_favorites(self, name) - 1 позитив, 2 негатив (название не в списке книг, книга уже есть в избранном)
@@ -66,4 +66,15 @@ class TestBooksCollector:
         collector.add_new_book(name)
         collector.add_new_book('Params')
         assert len(collector.get_books_genre()) == expected_count
-    
+
+# Проверка метода  get_books_with_specific_genre(), выводится список книг одно жанра   
+    def test_get_books_with_specific_genre_from_genre_list_books_shows(self):
+        collector = BooksCollector()
+        collector.add_new_book('Звёздные Войны')
+        collector.set_book_genre('Звёздные Войны', 'Фантастика') 
+        collector.add_new_book('Доктор Кто')
+        collector.set_book_genre('Доктор Кто', 'Фантастика') 
+        collector.add_new_book('Фунтик')
+        collector.set_book_genre('Фунтик', 'Мультфильмы')
+        print(collector.get_books_genre())
+        assert collector.get_books_with_specific_genre('Фантастика') == ['Звёздные Войны', 'Доктор Кто']
