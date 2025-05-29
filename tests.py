@@ -30,8 +30,8 @@ class TestBooksCollector:
 #+   def set_book_genre(self, name, genre) - 1 pos,  2 neg (нет в списке книг, жанра нет в списке жанров)
 #+   def get_book_genre(self, name) - 1 pos
 #+  def get_books_with_specific_genre(self, genre) 1 pos, 1 нег (жанра нет в списке жанров)
-#   def get_books_genre(self) - 1 позитив
-#   def get_books_for_children(self) - 1 позитив
+#+  def get_books_genre(self) - 1 позитив
+#+   def get_books_for_children(self) - 1 позитив
 #   def add_book_in_favorites(self, name) - 1 позитив, 2 негатив (название не в списке книг, книга уже есть в избранном)
 #   def delete_book_from_favorites(self, name) - 1 позитив, 1 негатив (книги нет в избранном)
 #   def get_list_of_favorites_books(self) - 1 позитив
@@ -39,6 +39,7 @@ class TestBooksCollector:
 # Проверка метода __init__ на корректную инициализацию books_genre и favorites
     def test_empty_books_genre_and_favorites_true(self):
         collector = BooksCollector()
+
         assert collector.books_genre == {} and collector.favorites == []
 
 # Проверка метода __init__ на корректную инициализацию genre и genre_age_rating    
@@ -46,12 +47,14 @@ class TestBooksCollector:
         collector = BooksCollector()
         expected_genre_list = ['Фантастика', 'Ужасы', 'Детективы', 'Мультфильмы', 'Комедии']
         expected_genre_age_rating = ['Ужасы', 'Детективы']
+
         assert collector.genre == expected_genre_list and collector.genre_age_rating == expected_genre_age_rating
 
 # Проверка метода add_new_book(), книга добавляется, при длине имени меньше 40 символов и отсутствии в коллекции  
     def test_add_new_book_14_letters_name_book_added(self):
         collector = BooksCollector()
         collector.add_new_book('Синий Трактор')
+
         assert len(collector.get_books_genre()) == 1
  
 # Проверка метода add_new_book(), книга не добавляется при некорректном имени
@@ -64,24 +67,76 @@ class TestBooksCollector:
         collector = BooksCollector()
         collector.add_new_book(name)
         collector.add_new_book('Котёнок Гав')
+
         assert len(collector.get_books_genre()) == expected_count
 
-# Проверка метода set_book_genre(). Книга добавляется, если она есть в списке книг и жанр из списка жанров    
-    def test_set_book_genre_book_and_genre_in_collectin_genre_added(self):
-        collector = BooksCollector()
-        collector.add_new_book('Преступление и наказание')
-        collector.set_book_genre('Преступление и наказание', 'Детективы')
-        assert collector.get_books_with_specific_genre('Детективы') == ['Преступление и наказание']
+# # Проверка метода set_book_genre(). Жанр добавляется, если она есть в списке книг и жанр из списка жанров    
+#     def test_set_book_genre_book_and_genre_in_collectin_genre_added(self):
+#         collector = BooksCollector()
+#         collector.add_new_book('Преступление и наказание')
+#         collector.set_book_genre('Преступление и наказание', 'Детективы')
+#         assert collector.get_books_with_specific_genre('Детективы') == ['Преступление и наказание']
 
-# Проверка метода set_book_genre(). Книга не добавляется
+# Проверка метода set_book_genre(). Жанр не добавляется
     @pytest.mark.parametrize('name, genre', [
-        ('Преступление и наказание', 'Скороговорки'),
-        ('Котёнок Гав', 'Мультфильмы'),
-        ('Преступление и наказание', ''),
-        ('', 'Детективы'),
+        ('Преступление и наказание', 'Скороговорки'), # Жанр не существует
+        ('Котёнок Гав', 'Мультфильмы'),     # Книга не существует
+        ('Преступление и наказание', ''),   # Жанр не указан
+        ('', 'Детективы'),                  # Название книги не указано
     ])
-    def test_set_book_genre_book_and_genre_in_collectin_genre_added(self, name, genre):
+    def test_set_book_genre_book_wrong_genre_request_genre_not_added(self, name, genre):
         collector = BooksCollector()
         collector.add_new_book('Преступление и наказание')
         collector.set_book_genre(name, genre)
+
         assert not collector.get_books_with_specific_genre(genre) == [name]
+
+# Проверка метода set_book_genre() и get_books_with_specific_genre(), выводится список книг одного жанра
+    def test_get_books_with_specific_genre_exist_genre_books_shows(self):
+        collector = BooksCollector()
+        books = [
+            ['Звёздные Войны', 'Фантастика'],
+            ['Доктор Кто', 'Фантастика'],
+            ['Фунтик', 'Мультфильмы']
+        ]
+        for i in books:
+            collector.add_new_book(i[0])
+            collector.set_book_genre(i[0], i[1])
+
+        assert collector.get_books_with_specific_genre('Фантастика') == ['Звёздные Войны', 'Доктор Кто']
+
+# Проверка метода set_book_genre() и get_books_with_specific_genre() с некорректными параметрами genre, список книг не выводится  
+    @pytest.mark.parametrize('genre', [
+        ('Скороговорки'), # Жанр не существует
+        ('Комедии'),    # Книг жанра нет в коллекции
+        ('')            # Жанр не указан
+    ])
+    def test_get_books_with_specific_genre_wrong_genre_books_not_shows(self, genre):
+        collector = BooksCollector()
+        books = [
+            ['Звёздные Войны', 'Фантастика'],
+            ['Доктор Кто', 'Фантастика'],
+            ['Фунтик', 'Мультфильмы']
+        ]
+        for i in books:
+            collector.add_new_book(i[0])
+            collector.set_book_genre(i[0], i[1])
+
+        assert collector.get_books_with_specific_genre(genre) == []
+
+# Проверка метода         collector = BooksCollector()() в коллекции есть книги, книги фильтруются и выводятся только детские
+    def test_get_books_for_children_books_exist_shows_only_children_books(self):
+        collector = BooksCollector()
+        books = [
+            ['Звёздные Войны', 'Фантастика'],
+            ['Доктор Кто', 'Фантастика'],
+            ['Фунтик', 'Мультфильмы'],
+            ['Кошмар на улице Вязов', 'Ужасы'],
+            ['Мост', 'Детектив']
+        ] 
+        for i in books:
+            collector.add_new_book(i[0])
+            collector.set_book_genre(i[0], i[1])
+
+        assert collector.get_books_for_children() == ['Звёздные Войны', 'Доктор Кто', 'Фунтик']
+
